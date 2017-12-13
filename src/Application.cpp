@@ -1,6 +1,9 @@
 #include "Application.h"
 #include <iostream>
+#include <chrono>
 #include <SDL2/SDL_image.h>
+
+
 
 Application::Application()
 {
@@ -25,9 +28,51 @@ Application::Application()
     SDL_RenderSetLogicalSize(renderer, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 }
 
+constexpr std::chrono::milliseconds timestep(16);
+
+
 void Application::run(void)
 {
-    SDL_Delay(5000);
+    // TODO: Convert to using once gcc >= 4.8
+    SDL_Event event;
+    typedef std::chrono::high_resolution_clock clock;
+    std::chrono::milliseconds lag(0);
+    auto time_start = clock::now();
+    bool running = true;
+    do {
+        auto time_now = clock::now();
+        auto delta_time = time_now - time_start;
+        lag += std::chrono::duration_cast<std::chrono::milliseconds>(delta_time);
+        time_start = time_now;
+        // InputHandlerSystem
+        while(SDL_PollEvent(&event)) {
+            std::cout << "Event: " << std::endl;
+            switch (event.type) {
+                case SDL_QUIT:
+                    running = false;
+                    break;
+                case SDL_KEYDOWN:
+                    if (event.key.keysym.sym == SDLK_ESCAPE) {
+                        running = false;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+        while(lag >= timestep) {
+//            std::cout << "- update: " << lag.count() << std::endl;
+            lag -= timestep;
+            SDL_Delay(5);
+        }
+        // calculate how close or far we are from the next timestep
+        auto alpha = (float) lag.count() / timestep.count();
+        //auto interpolated_state = interpolate(current_state, previous_state, alpha);
+        //std::cout << "alpha : " << alpha << std::endl;
+//        std::cout << "render: " << alpha << std::endl;
+        SDL_RenderClear(renderer);
+        SDL_RenderPresent(renderer);
+    } while(running);
 }
 
 Application::~Application()
