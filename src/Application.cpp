@@ -1,11 +1,20 @@
 #include "Application.h"
 #include <iostream>
+#include <vector>
 #include <chrono>
+#include <functional>
 #include <SDL2/SDL_image.h>
 
+#include "edb/EntityDb.h"
+#include "edb/System.h"
+#include "Components.h"
+#include "systems/RenderSystem.h"
 
+static edb::EntityDb eDB = edb::EntityDb();
 
-Application::Application()
+static std::vector<std::unique_ptr<edb::SystemI>> systems;
+
+Application::Application() : renderer(NULL)
 {
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Unable to initialize SDL: %s", SDL_GetError());
@@ -26,53 +35,37 @@ Application::Application()
     }
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
     SDL_RenderSetLogicalSize(renderer, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+    this->game = Game(window, renderer);
+    std::cout << "return for Application()" << std::endl;
 }
 
-constexpr std::chrono::milliseconds timestep(16);
+constexpr std::chrono::milliseconds timestep(1000/60);
 
 
 void Application::run(void)
 {
-    // TODO: Convert to using once gcc >= 4.8
-    SDL_Event event;
+    // TODO: Convert to `using clock = ` once on gcc >= 4.8
     typedef std::chrono::high_resolution_clock clock;
     std::chrono::milliseconds lag(0);
     auto time_start = clock::now();
-    bool running = true;
     do {
         auto time_now = clock::now();
         auto delta_time = time_now - time_start;
         lag += std::chrono::duration_cast<std::chrono::milliseconds>(delta_time);
         time_start = time_now;
-        // InputHandlerSystem
-        while(SDL_PollEvent(&event)) {
-            std::cout << "Event: " << std::endl;
-            switch (event.type) {
-                case SDL_QUIT:
-                    running = false;
-                    break;
-                case SDL_KEYDOWN:
-                    if (event.key.keysym.sym == SDLK_ESCAPE) {
-                        running = false;
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
+        // update hook
+        game.handle_input();
         while(lag >= timestep) {
-//            std::cout << "- update: " << lag.count() << std::endl;
             lag -= timestep;
-            SDL_Delay(5);
+            // runloop hook
+            game.step_simulation(timestep.count());
         }
         // calculate how close or far we are from the next timestep
-        auto alpha = (float) lag.count() / timestep.count();
-        //auto interpolated_state = interpolate(current_state, previous_state, alpha);
-        //std::cout << "alpha : " << alpha << std::endl;
-//        std::cout << "render: " << alpha << std::endl;
-        SDL_RenderClear(renderer);
-        SDL_RenderPresent(renderer);
-    } while(running);
+        auto iterpolation = (float) lag.count() / timestep.count();
+        // render hook
+        game.render(iterpolation);
+        SDL_Delay(10);
+    } while(game.running);
 }
 
 Application::~Application()

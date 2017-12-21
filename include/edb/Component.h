@@ -2,14 +2,18 @@
 #define COMPONENT_H_INCLUDED
 
 namespace edb {
-    #define INVALID_COMPONENT 0
-    // start simple with just an enum registry.
-    typedef enum {
-        COMPONENT_TYPE_POSITION = 1, // << 0,
-    } ComponentType;
 
+    typedef unsigned int ComponentIndex;
+
+    #define INVALID_COMPONENT -1
+    // start simple with just an enum registry.
+    enum ComponentType : unsigned int;
+
+    // base interface to a component is its 'type' attribute.
     struct Component {
-        static const ComponentType type = INVALID_COMPONENT;
+        static const ComponentType type;
+
+        virtual ~Component(){};
     };
 }
 
