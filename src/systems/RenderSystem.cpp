@@ -1,18 +1,12 @@
 #include <iostream>
 
 #include "RenderSystem.h"
+#include "edb/EntityDb.h"
 
-
-
-RenderSystem::RenderSystem() : renderer(NULL)
+RenderSystem::RenderSystem(edb::EntityDb &db, SDL_Renderer *renderer) : SystemR(db), renderer(renderer), edb(db)
 {
-//    components = &edb.renderableComponents;
-    std::cout << "RenderSystem: constructor" << std::endl;
-}
-
-RenderSystem::RenderSystem(SDL_Renderer *renderer) : renderer(renderer)
-{
-    std::cout << "RenderSystem: I'm alive!" << std::endl;
+    std::cout << "RenderSystem: constructor: " << std::endl;
+    std::cout << (&db) << " : " << (&edb) << std::endl;
 }
 
 RenderSystem::~RenderSystem()
@@ -23,10 +17,12 @@ RenderSystem::~RenderSystem()
 
 void RenderSystem::render(float delta)
 {
-//    std::cout << "render update: " <<  (*components).size() << std::endl;
-    SDL_RenderClear(renderer);
-//    for (auto c : components) {
-//        std::cout << "render update" << std::endl;
-//    }
-    SDL_RenderPresent(renderer);
+    auto comps = edb.componentStorage.view<RenderableComponent>();
+    std::cout << "render update: " <<  comps.size() << std::endl;
+    std::cout << "RenderSystem::render " << (renderer) << std::endl;
+    for (auto const &c : comps) {
+        //std::cout << "SDL_RenderCopy(renderer, c.texture, " << c.src_rect << ", " << c.dest_rect << std::endl;
+        SDL_RenderCopy(renderer, c.texture, NULL, NULL);
+    }
+
 }

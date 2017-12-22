@@ -10,5 +10,4 @@ namespace edb {
         simulationSystems.reserve(10);
         renderSystems.reserve(10);
     }
-    EntityDb::~EntityDb() {}
 }

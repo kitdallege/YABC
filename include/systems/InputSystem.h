@@ -7,7 +7,7 @@
 
 struct InputSystem : public edb::SystemH<InputSystem>
 {
-    InputSystem(edb::EntityDb& edb); // : SystemH(edb) {}
+    InputSystem(edb::EntityDb& edb);
     ~InputSystem();
     void handle_input(bool &running);
 };

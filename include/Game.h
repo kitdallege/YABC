@@ -12,6 +12,7 @@ class Game
         Game(SDL_Window *window, SDL_Renderer *renderer);
         ~Game();
 
+        void init(); // resource initialization.
         void handle_input();
         void step_simulation(float delta);
         void render(float iterpolation);

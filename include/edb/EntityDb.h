@@ -23,7 +23,6 @@ namespace edb {
         edb::Entity nextEntity;
 
         EntityDb();
-        ~EntityDb();
 
         template <typename S, typename ... Args>
         void add_input_system(Args&&... args){
@@ -35,14 +34,15 @@ namespace edb {
         template <typename S, typename ... Args>
         void add_simulation_system(Args&&... args){
             static_assert(std::is_base_of<edb::SystemSI, S>::value, "S must be a SystemHI");
-            std::unique_ptr<S> p(new S(std::forward<Args>(args)...));
+            std::unique_ptr<S> p(new S(*this, std::forward<Args>(args)...));
             simulationSystems.push_back(std::move(p));
         }
 
         template <typename S, typename ... Args>
         void add_render_system(Args&&... args){
             static_assert(std::is_base_of<edb::SystemRI, S>::value, "S must be a SystemHI");
-            std::unique_ptr<S> p(new S(std::forward<Args>(args)...));
+            std::cout << "add_render_system: " << (this) << std::endl;
+            std::unique_ptr<S> p(new S(*this, std::forward<Args>(args)...));
             renderSystems.push_back(std::move(p));
         }
 

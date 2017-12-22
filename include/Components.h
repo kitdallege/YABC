@@ -27,13 +27,12 @@ struct SpatialComponent : edb::Component {
 };
 
 struct RenderableComponent : edb::Component {
-    SDL_Rect src_rect;
-    SDL_Rect dest_rect;
+    SDL_Rect *src_rect;
+    SDL_Rect *dest_rect;
     SDL_Texture *texture;
-
+    RenderableComponent(){};
+    RenderableComponent(SDL_Rect *src_rect, SDL_Rect *dest_rect, SDL_Texture *texture) : src_rect(src_rect), dest_rect(dest_rect), texture(texture) {}
     static const edb::ComponentType type = edb::COMPONENT_TYPE_RENDERER;
-    RenderableComponent();
-    ~RenderableComponent();
 };
 
 #endif // COMPONENTS_H_INCLUDED

@@ -14,12 +14,13 @@ class RenderSystem : public edb::SystemR<RenderSystem>
 
     public:
         RenderSystem();
-        RenderSystem(SDL_Renderer *renderer);
+        RenderSystem(edb::EntityDb& edb, SDL_Renderer *renderer);
         ~RenderSystem();
         void render(float delta);
 
     private:
-        SDL_Renderer *renderer;
+        SDL_Renderer    *renderer;
+        edb::EntityDb   &edb;
 };
 
 #endif // RENDERSYSTEM_H

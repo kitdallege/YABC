@@ -56,12 +56,15 @@ namespace edb {
     };
 
     struct SystemSI {
+        SystemSI(edb::EntityDb& edb){}
         virtual ~SystemSI() {};
         virtual void step_simulation(float delta) = 0;
     };
     template<typename T>
     struct SystemS : SystemSI
     {
+        SystemS() : SystemSI(){}
+        SystemS(edb::EntityDb& edb) : SystemSI(edb){}
         void step_simulation_(float delta)
         {
             static_cast<T const&>(*this).step_simulation(delta);
@@ -69,12 +72,15 @@ namespace edb {
     };
 
     struct SystemRI {
+        SystemRI(edb::EntityDb& edb){}
         virtual ~SystemRI() {};
         virtual void render(float iterpolation) = 0;
     };
     template<typename T>
     struct SystemR : SystemRI
     {
+        SystemR() : SystemRI(){}
+        SystemR(edb::EntityDb& edb) : SystemRI(edb){}
         void render_(float iterpolation)
         {
             static_cast<T const&>(*this).render(iterpolation);
