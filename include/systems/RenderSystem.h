@@ -9,21 +9,17 @@
 #include "edb/System.h"
 #include "Components.h"
 
-class RenderSystem : public edb::System<RenderSystem>
+class RenderSystem : public edb::SystemR<RenderSystem>
 {
 
     public:
         RenderSystem();
         RenderSystem(SDL_Renderer *renderer);
         ~RenderSystem();
-
-        void handle_input(bool &running){}
-        void step_simulation(float delta){}
         void render(float delta);
 
     private:
         SDL_Renderer *renderer;
-        //std::vector<RenderableComponent> &components;
 };
 
 #endif // RENDERSYSTEM_H

@@ -5,13 +5,11 @@
 #include "edb/System.h"
 
 
-struct InputSystem : edb::System<InputSystem>
+struct InputSystem : edb::SystemH<InputSystem>
 {
     InputSystem();
     ~InputSystem();
     void handle_input(bool &running);
-    void step_simulation(float delta){};
-    void render(float delta){};
 };
 
 #endif // INPUTSYSTEM_H

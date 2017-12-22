@@ -5,16 +5,16 @@
 
 namespace edb {
 
-    EntityDb::EntityDb() : systems(), ecIndex(), eciIndex(), nextEntity(1) {}
+    EntityDb::EntityDb() : systems(), componentStorage(), nextEntity(1) {}
 
     EntityDb::~EntityDb()
     {
         //dtor
     }
-    void EntityDb::add_system(std::unique_ptr<edb::SystemI> system) {
-        std::cout << "Adding system" << std::endl;
-        systems.push_back(std::move(system));
-    }
+//    void EntityDb::add_system(std::unique_ptr<edb::SystemI> system) {
+//        std::cout << "Adding system" << std::endl;
+//        systems.push_back(std::move(system));
+//    }
 
     edb::Entity EntityDb::create_entity() {
         return nextEntity++;

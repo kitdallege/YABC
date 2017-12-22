@@ -12,61 +12,104 @@
 #include "Components.h"
 
 namespace edb {
+    template<typename CType>
+    class BaseStorage
+    {
+        std::vector<CType> table;
+        std::map<edb::Entity, edb::ComponentIndex> ecIndex;
+        std::map<edb::ComponentIndex, edb::Entity> eciIndex;
+
+        public:
+            template <typename ... Args>
+            void add(edb::Entity e, Args&&... args)
+            {
+                auto idx = table.size();
+                table.emplace_back(std::forward<Args>(args)...);
+                ecIndex[e] = idx;
+                eciIndex[idx] = e;
+            }
+
+            // remove(edb::Entity e) : removes the associated component for
+            // this entity.
+            const std::vector<CType>& view()
+            {
+                return table;
+            }
+
+    };
+    class ComponentStorage : private BaseStorage<InputComponent>,
+                    private BaseStorage<SpatialComponent>,
+                    private BaseStorage<RenderableComponent>
+    {
+        public:
+            template<typename CType, typename ... Args>
+            void add(edb::Entity e, Args&&... args)
+            {
+                BaseStorage<CType>::add(e, std::forward<Args>(args)...);
+            }
+
+            template<typename CType>
+            const std::vector<CType>& view()
+            {
+                return BaseStorage<CType>::view();
+            }
+
+    };
 
     struct EntityDb {
+        //TODO: bust out into a vector per system-type
+        // input/simulation/render
+        std::vector<std::unique_ptr<edb::SystemHI>> inputSystems;
+        std::vector<std::unique_ptr<edb::SystemSI>> simulationSystems;
+        std::vector<std::unique_ptr<edb::SystemRI>> renderSystems;
         std::vector<std::unique_ptr<edb::SystemI>> systems;
-        // NOTE: To make this truly cache-friendly you'd basically have a
-        // vector 'per' component-type so that you could store
-        // objects (not unique_ptr's) contiguously in memory.
-        /* Tables */
-        std::vector<InputComponent>         inputComponents;
-        std::vector<SpatialComponent>       spatialComponents;
-        std::vector<RenderableComponent>    renderableComponents;
-        /* TODO: Use this table/index combination for the main store.
-        // Systems will then be able to ref vector's of components
-        // compute the 'intersection of entity keys'
-        // and iterate using the ecIndex(s) to walk through the component vectors.
-        */
-        /* Index */
-        std::map<edb::ComponentType, std::map<edb::Entity, edb::ComponentIndex> > ecIndex;
-        std::map<edb::ComponentType, std::map<edb::ComponentIndex, edb::Entity>> eciIndex;
-
-        //std::map<edb::ComponentType, std::vector<edb::Component>> cIndex;
-        // Pros: It makes compaction of cIndex (after component/entity removal) a lot
-        // easier [from O(n) to O(1)].
-        // Cons: It doubles the memory space for indexes. (([32-to-64]bits per entry) * num-entries) * 2) :/
-        // Note: Boost.Bimap is ideal as its basically bimap =  map<x,y> + map<y,x>
-        // TODO: remove below 'ecIndex'.
-        //std::map<edb::Entity, std::map<edb::ComponentType, edb::Component>> ecIndex;
+        ComponentStorage componentStorage;
         edb::Entity nextEntity;
 
         EntityDb();
         ~EntityDb();
 
         // system creation & registry
-        void add_system(std::unique_ptr<edb::SystemI> system);
+//        void add_system(std::unique_ptr<edb::SystemI> system);
 
         template <typename S, typename ... Args>
         void add_system(Args&&... args){
             static_assert(std::is_base_of<edb::SystemI, S>::value, "S must be a SystemI");
             std::unique_ptr<S> p(new S(std::forward<Args>(args)...));
-            add_system(std::move(p));
+//            add_system(std::move(p));
+        }
+
+        template <typename S, typename ... Args>
+        void add_input_system(Args&&... args){
+            static_assert(std::is_base_of<edb::SystemHI, S>::value, "S must be a SystemHI");
+            std::unique_ptr<S> p(new S(std::forward<Args>(args)...));
+            inputSystems.push_back(std::move(p));
+        }
+
+        template <typename S, typename ... Args>
+        void add_simulation_system(Args&&... args){
+            static_assert(std::is_base_of<edb::SystemSI, S>::value, "S must be a SystemHI");
+            std::unique_ptr<S> p(new S(std::forward<Args>(args)...));
+            simulationSystems.push_back(std::move(p));
+        }
+
+        template <typename S, typename ... Args>
+        void add_render_system(Args&&... args){
+            static_assert(std::is_base_of<edb::SystemRI, S>::value, "S must be a SystemHI");
+            std::unique_ptr<S> p(new S(std::forward<Args>(args)...));
+            renderSystems.push_back(std::move(p));
         }
 
         // entity & component creation and linkage
         edb::Entity create_entity();
 
-
-        bool add_component(edb::Entity e, edb::ComponentType ct, std::unique_ptr<edb::Component> c);
-
-        template<typename C>
-        bool add_component(edb::Entity e, std::unique_ptr<C> c) {
+        template<typename C, typename ... Args>
+        bool add_component(edb::Entity e, Args&&... args) {
             static_assert(std::is_base_of<edb::Component, C>::value, "C must be a Component");
-            return add_component(e, C::type, std::move(c));
+            componentStorage.add<C>(e, std::forward<Args>(args)...);
+            return true;
         }
-
         // listen/notify methods
-
     };
 }
 #endif // ENTITYDB_H

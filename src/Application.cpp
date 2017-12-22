@@ -10,9 +10,9 @@
 #include "Components.h"
 #include "systems/RenderSystem.h"
 
+constexpr std::chrono::milliseconds timestep(1000/60);
 static edb::EntityDb eDB = edb::EntityDb();
 
-static std::vector<std::unique_ptr<edb::SystemI>> systems;
 
 Application::Application() : renderer(NULL)
 {
@@ -39,7 +39,7 @@ Application::Application() : renderer(NULL)
     std::cout << "return for Application()" << std::endl;
 }
 
-constexpr std::chrono::milliseconds timestep(1000/60);
+
 
 
 void Application::run(void)
