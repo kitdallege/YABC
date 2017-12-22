@@ -3,9 +3,9 @@
 #include <SDL2/SDL.h>
 #include "Components.h"
 
-InputSystem::InputSystem()
+InputSystem::InputSystem(edb::EntityDb &edb) : SystemH(edb)
 {
-    std::cout << "InputSystem: I'm alive!" << std::endl;
+    std::cout << "InputSystem: I'm alive! " << (&edb) << std::endl;
 }
 
 InputSystem::~InputSystem()

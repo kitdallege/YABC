@@ -5,9 +5,9 @@
 #include "edb/System.h"
 
 
-struct InputSystem : edb::SystemH<InputSystem>
+struct InputSystem : public edb::SystemH<InputSystem>
 {
-    InputSystem();
+    InputSystem(edb::EntityDb& edb); // : SystemH(edb) {}
     ~InputSystem();
     void handle_input(bool &running);
 };

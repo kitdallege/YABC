@@ -5,9 +5,11 @@
 #include "edb/Entity.h"
 #include "edb/Component.h"
 
+
 #include <set>
 
 namespace edb {
+    struct EntityDb;
 
     // TODO: Split into 3 'System' bases one for each handle_input,step_simulation,render
     // it would allow
@@ -37,12 +39,16 @@ namespace edb {
     };
 
     struct SystemHI {
+        SystemHI(edb::EntityDb& edb){}
         virtual ~SystemHI() {};
         virtual void handle_input(bool &running) = 0;
+
     };
     template<typename T>
     struct SystemH : SystemHI
     {
+        SystemH() : SystemHI(){}
+        SystemH(edb::EntityDb& edb) : SystemHI(edb){}
         void handle_input_(bool &running)
         {
             static_cast<T const&>(*this).handle_input(running);

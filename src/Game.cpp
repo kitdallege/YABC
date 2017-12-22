@@ -30,6 +30,7 @@ Game::Game(SDL_Window *window, SDL_Renderer *renderer) :
 }
 
 void Game::handle_input() {
+    std::cout << "edb.inputSystems: "       << edb.inputSystems.size() << std::endl;
     for (auto &sys : edb.inputSystems) {
         sys->handle_input(running);
     }
