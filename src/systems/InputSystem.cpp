@@ -1,9 +1,13 @@
-#include "InputSystem.h"
 #include <iostream>
-#include <SDL2/SDL.h>
-#include "Components.h"
+#include <vector>
 
-InputSystem::InputSystem(edb::EntityDb&edb) : SystemH(edb)
+#include <SDL2/SDL.h>
+
+#include "InputSystem.h"
+#include "Components.h"
+#include "edb/EntityDb.h"
+
+InputSystem::InputSystem(edb::EntityDb& db) : SystemH(edb), edb(db)
 {
     std::cout << "InputSystem: I'm alive! " << (&edb) << std::endl;
 }
@@ -16,10 +20,10 @@ InputSystem::~InputSystem()
 
 void InputSystem::handle_input(bool &running)
 {
-    std::cout << "InputSystem::handle_input" << std::endl;
+    auto ip = edb.componentStorage.view<InputComponent>();
     SDL_Event event;
     while(SDL_PollEvent(&event)) {
-        std::cout << "Event: " << std::endl;
+//        std::cout << "Event: " << std::endl;
         switch (event.type) {
             case SDL_QUIT:
                 running = false;
@@ -33,4 +37,10 @@ void InputSystem::handle_input(bool &running)
                 break;
         }
     }
+
+    int *x, *y;
+    SDL_GetMouseState(x, y);
+    InputComponent ic = ip.at(0);
+    ic.mouse_location.x = (float) *x;
+    ic.mouse_location.y = (float) *y;
 }

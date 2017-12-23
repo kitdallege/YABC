@@ -7,7 +7,6 @@
 #include <SDL2/SDL.h>
 
 #include "edb/System.h"
-#include "Components.h"
 
 class RenderSystem : public edb::SystemR<RenderSystem>
 {

@@ -21,8 +21,8 @@ Application::Application() : renderer(NULL)
     }
     IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF);
     window = SDL_CreateWindow("YABC", SDL_WINDOWPOS_UNDEFINED,
-                              SDL_WINDOWPOS_UNDEFINED, 480,
-                              320, SDL_WINDOW_RESIZABLE);
+                              SDL_WINDOWPOS_UNDEFINED, DISPLAY_WIDTH,
+                              DISPLAY_HEIGHT, SDL_WINDOW_RESIZABLE);
     if (!window) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                      "Unable to initialize Window: %s", SDL_GetError());
@@ -34,6 +34,7 @@ Application::Application() : renderer(NULL)
                      SDL_GetError());
     }
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+    SDL_CaptureMouse(SDL_TRUE);
     SDL_RenderSetLogicalSize(renderer, DISPLAY_WIDTH, DISPLAY_HEIGHT);
     game = Game(window, renderer);
     game.init();

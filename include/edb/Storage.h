@@ -48,6 +48,8 @@ namespace edb {
             }
             // some type of `const std::vector<edb::Entity>& join<CType1, CType2>()`
             // which returns a vector of entities which are in both
+            // and then a way to get<CType>(entity) such that i'm not
+            // killing the cache.
 
     };
 }

@@ -5,11 +5,16 @@
 #include "edb/System.h"
 
 
-struct InputSystem : public edb::SystemH<InputSystem>
+class InputSystem : public edb::SystemH<InputSystem>
 {
-    InputSystem(edb::EntityDb& edb);
-    ~InputSystem();
-    void handle_input(bool &running);
+
+    public:
+        InputSystem(edb::EntityDb& edb);
+        ~InputSystem();
+        void handle_input(bool &running);
+
+    private:
+        edb::EntityDb   &edb;
 };
 
 #endif // INPUTSYSTEM_H

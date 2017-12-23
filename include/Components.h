@@ -22,7 +22,7 @@ struct InputComponent : edb::Component {
 
 struct SpatialComponent : edb::Component {
     Vec2 position;
-
+    SpatialComponent(Vec2 position) : position(position) {};
     static const edb::ComponentType type = edb::COMPONENT_TYPE_POSITION;
 };
 

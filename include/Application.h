@@ -23,8 +23,8 @@ private:
     SDL_Window *window;
     SDL_Renderer *renderer;
     static const std::string TITLE;
-    static const int DISPLAY_WIDTH = 640;
-    static const int DISPLAY_HEIGHT = 480;
+    static const int DISPLAY_WIDTH = 1280;
+    static const int DISPLAY_HEIGHT = 720;
 };
 
 #endif // APPLICATION_H
